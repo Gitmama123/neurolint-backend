@@ -148,3 +148,9 @@ ${code}
     res.status(500).json({ error: "AI processing failed" });
   }
 });
+
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`NeuroLint Azure Backend Running on port ${PORT}`);
+});
