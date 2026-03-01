@@ -55,14 +55,15 @@ app.post("/analyze", async (req, res) => {
     const structuralScore = computeStructuralScore(code);
 
     // 🧠 Mode-based perception adjustment
-const modeOffset = {
-  beginner: 2,
-  intermediate: 0,
-  expert: -2
+const experienceCompression = {
+  beginner: 1.2,
+  intermediate: 1.0,
+  expert: 0.7
 };
 
-const adjustedBaseline =
-  structuralScore + (modeOffset[mode] || 0);
+const adjustedBaseline = Math.round(
+  structuralScore * (experienceCompression[mode] || 1)
+);
 
     const systemPrompt = `
 You are NeuroLint, a cognitive code analysis engine.
