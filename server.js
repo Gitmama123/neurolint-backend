@@ -54,10 +54,20 @@ app.post("/analyze", async (req, res) => {
 
     const structuralScore = computeStructuralScore(code);
 
+    // 🧠 Mode-based perception adjustment
+const modeOffset = {
+  beginner: 2,
+  intermediate: 0,
+  expert: -2
+};
+
+const adjustedBaseline =
+  structuralScore + (modeOffset[mode] || 0);
+
     const systemPrompt = `
 You are NeuroLint, a cognitive code analysis engine.
 
-Structural complexity baseline: ${structuralScore}
+Structural complexity baseline: ${adjustedBaseline}
 
 You may adjust the cognitive_load_score by AT MOST ±1 from this baseline.
 
@@ -130,14 +140,15 @@ ${code}
 
     // 🔥 HARD CLAMP MODEL SCORE
     const modelScore = structured.cognitive_load_score ?? structuralScore;
-
-    const lowerBound = structuralScore - 1;
-    const upperBound = structuralScore + 1;
-
+    const lowerBound = adjustedBaseline - 1;
+    const upperBound = adjustedBaseline + 1;
     const finalScore = Math.max(
-      1,
-      Math.min(10, Math.max(lowerBound, Math.min(upperBound, modelScore)))
-    );
+  1,
+  Math.min(
+    10,
+    Math.max(lowerBound, Math.min(upperBound, modelScore))
+  )
+);
 
     structured.cognitive_load_score = finalScore;
 
